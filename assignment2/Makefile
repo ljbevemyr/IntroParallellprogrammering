@@ -4,6 +4,7 @@
 PROG=primeLP
 
 all: $(PROG).cpp
+	g++ -std=c++11 -Wall -pthread  integral.cpp -o integral
 	g++ -std=c++11 -Wall -pthread $(PROG).cpp -o $(PROG)
 	g++ -Wall -std=c++11 -pthread -O3 benchmark_example1.cpp -o bench1
 	g++ -Wall -std=c++11 -pthread -O3 benchmark_example2.cpp -o bench2

@@ -39,6 +39,9 @@ int main(int argc, char *argv[])
   float width = (float)1/number_of_traps;
   int k = 0;
 
+  // *** timing begins here ***
+  auto start_time = std::chrono::system_clock::now();
+  
   for (int i=0; i<number_of_traps; ++i) {
     float end = start + width;
     th[k] = std::thread(calc_area, start, end);
@@ -57,7 +60,13 @@ int main(int argc, char *argv[])
     th[i].join();
   }
 
-  std::cout << tot_sum << std::endl;
   delete[] th;
+
+  std::chrono::duration<double> duration = (std::chrono::system_clock::now() - start_time); // *** timing ends here ***
+
+   std::cout << "Finished in " << duration.count() << " seconds (wall clock)." << std::endl;
+
+  std::cout << tot_sum << std::endl;
+    
   return 0;
 }

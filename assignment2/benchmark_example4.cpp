@@ -6,7 +6,7 @@
 #include <mutex>
 
 #include "benchmark.hpp"
-#include "sorted_list.hpp"
+#include "sorted_list4.hpp"
 
 static const int DATA_VALUE_RANGE_MIN = 0;
 static const int DATA_VALUE_RANGE_MAX = 256;

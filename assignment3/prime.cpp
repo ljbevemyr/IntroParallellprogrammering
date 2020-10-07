@@ -2,6 +2,9 @@
 #include <pthread.h>
 #include <cmath>
 #include <vector>
+#include "omp.h"
+#include <bits/stdc++.h>
+using namespace std;
 
 struct arg_struct {
   bool *mark;
@@ -9,6 +12,13 @@ struct arg_struct {
   int end;
   int sqrt_chunk;
 };
+
+int atoi(char* str) {
+  int res = 0;
+  for (int i = 0; str[i] != '\0'; ++i)
+    res = res * 10 + str[i] - '0';
+  return res;
+}
 
 void first_calc_prime(bool *mark, int end) {
  int k = 2;
@@ -47,13 +57,6 @@ static void *chunk_calc_prime(void *args0) {
       for (int i=prime_start; i<=end; i=i+k) {
           mark[i] = true;
       }
-      /* for (int i=k+1; i<end; i++) {
-        bool status = mark[i];
-        if (status == false) {
-          k = i;
-          break;
-        }
-        }*/
     }
     k++;
   }
@@ -97,46 +100,28 @@ int main(int argc, char *argv[]) {
 
   //Initiate threads
   struct arg_struct args[no_threads];
-  pthread_t threads[no_threads];
-  pthread_attr_t attr;
-  int rc;
-
-  pthread_attr_init(&attr);
 
   for (int i=0 ; i<no_threads ; i++) {
     args[i].start = start_of_chunks[i];
     args[i].end = end_of_chunks[i];
     args[i].sqrt_chunk = sqrt_chunk;
     args[i].mark = mark;
-
-    rc = pthread_create(&threads[i], &attr, chunk_calc_prime,
-                        (void *) &args[i]);
-
-    if (rc) {
-      std::cout << "Error:unable to create thread," << rc << std::endl;
-      exit(-1);
-    }
   }
 
-  pthread_attr_destroy(&attr);
-
-  for (int i=0 ; i < no_threads ; i++) {
-    void *status;
-    rc = pthread_join(threads[i], &status);
-    if (rc) {
-      std::cout << "Error: unable to join, " << rc << std::endl;
-      exit(-1);
-    }
+  omp_set_num_threads(no_threads);
+  #pragma omp parallel
+  {
+    int id = omp_get_thread_num();
+    chunk_calc_prime(&args[id]);
   }
 
   for (int i=2; i<max; i++) {
-  if (mark[i] == false) {
-   std::cout << i << std::endl;
-   }
-   else {
+    if (mark[i] == false) {
+      std::cout << i << std::endl;
+    }
+    else {
+    }
+  }
 
-   }
-   }
-
- return 0;
+return 0;
 }

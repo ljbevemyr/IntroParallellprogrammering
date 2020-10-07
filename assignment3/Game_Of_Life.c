@@ -70,6 +70,7 @@ static void print_to_pgm(int ** array, int N, int t) {
 #endif
 
 static void tick_thread(int T, int N, int ** current, int ** previous) {
+  printf("start thread\n");
   int t, i, j, nbrs;
   int thread_num = omp_get_thread_num();
   int thread_tot = omp_get_num_threads();
@@ -105,6 +106,7 @@ static void tick_thread(int T, int N, int ** current, int ** previous) {
     end_v = (tot_elem*(thread_num+1) / (N-2)) + 1;
     end_h = (tot_elem*(thread_num+1) % (N-2));
   }
+  printf("Thread: %d, start: %d:%d, end: %d:%d\n", thread_num, start_v, start_h, end_v, end_h);
   for (t = 0 ; t < T ; t++) { //time steps
     for (i = start_v ; i < end_v ; i++) //array dimensions
       for (j = start_h ; j < end_h ; j++) { //array dimensions
@@ -129,6 +131,7 @@ static void tick_thread(int T, int N, int ** current, int ** previous) {
 }
 
 int main (int argc, char * argv[]) {
+  printf("start\n");
   int N; //array dimensions
   int T; //time steps
   int ** current, ** previous; //arrays - one for current timestep, one for previous timestep
@@ -156,9 +159,9 @@ int main (int argc, char * argv[]) {
 
   init_random(previous, current, N);//initialize previous array with pattern
 
-#ifdef OUTPUT
-  print_to_pgm(previous, N, 0);
-#endif
+  #ifdef OUTPUT
+    print_to_pgm(previous, N, 0);
+  #endif
 
   /*Game of Life*/
 
@@ -185,7 +188,12 @@ int main (int argc, char * argv[]) {
 
     }*/
 
-  
+  omp_set_num_threads(threads);
+  #pragma omp parallel
+  {
+    tick_thread(T, N, current, previous);
+  }
+
   gettimeofday(&tf,NULL);
   time = (tf.tv_sec-ts.tv_sec)+(tf.tv_usec-ts.tv_usec)*0.000001;
 

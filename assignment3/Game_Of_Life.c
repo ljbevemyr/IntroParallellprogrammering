@@ -73,14 +73,14 @@ static void tick_thread(int T, int N, int ** current, int ** previous) {
   int t, i, j, nbrs;
   int thread_num = omp_get_thread_num();
   int thread_tot = omp_get_num_threads();
-  int size = N/thread_tot;
+  int size = (N-2)/thread_tot;
   int *start = malloc(thread_tot * sizeof(int*));
   int *end = malloc(thread_tot * sizeof(int*));
 
   start[0] = 1;
   for (i=0; i < thread_tot-1; i++) {
     end[i] = start[i] + size;
-    start[i+1] = end[i] + 1;
+    start[i+1] = end[i];
   }
   end[thread_tot-1] = N-2;
 
@@ -113,7 +113,6 @@ static void tick_thread(int T, int N, int ** current, int ** previous) {
 }
 
 int main (int argc, char * argv[]) {
-  printf("start\n");
   int N; //array dimensions
   int T; //time steps
   int ** current, ** previous; //arrays - one for current timestep, one for previous timestep

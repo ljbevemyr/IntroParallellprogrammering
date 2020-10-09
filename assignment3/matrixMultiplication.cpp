@@ -3,6 +3,7 @@
 
 int main(int argc, char *argv[])
 {
+  int dim = 5;
   int a[dim][dim] {};
   int b[dim][dim] {};
   int c[dim][dim] {};

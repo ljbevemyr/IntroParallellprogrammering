@@ -58,9 +58,12 @@ int main(int argc, char *argv[])
   struct timeval ts, tf;
 
   gettimeofday(&ts,NULL);
+  omp_set_num_threads(16);
 #pragma omp parallel default(none) shared (a, b, c, dim)
    {         
        #pragma omp for schedule(static) collapse(3)
+     //#pragma omp for schedule(static) collapse(2)
+     //#pragma omp for schedule(static)
        for (int i = 0; i < dim; i++) {         
          for (int j = 0; j < dim; j++) {            
              for (int k = 0; k < dim; k++) {

@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-  int dim = 5;
+  int dim = 1000;
   int a[dim][dim] {};
   int b[dim][dim] {};
   int c[dim][dim] {};
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   #pragma omp parallel default(none) shared (a, b, c, dim) num_threads(4)
    {         
      #pragma omp for schedule(static)
-       for (int i = 0; i < dim; i++) {
+       for (int i = 0; i < dim; i++) {                  
          for (int j = 0; j < dim; j++) {
             c[i][j] = 0;
              for (int k = 0; k < dim; k++) {

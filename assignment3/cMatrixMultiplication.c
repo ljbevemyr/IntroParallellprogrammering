@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <omp.h>
+#include <sys/time.h>
+#include <stdio.h>
 
 
 static int ** allocate_a(int N) {
@@ -51,7 +53,11 @@ int main(int argc, char *argv[])
   int **a = allocate_a(dim);
   int **b = allocate_b(dim);
   int **c = allocate_c(dim);
-    
+
+  double time;
+  struct timeval ts, tf;
+
+  gettimeofday(&ts,NULL);
 #pragma omp parallel default(none) shared (a, b, c, dim)
    {         
        #pragma omp for schedule(static) collapse(3)
@@ -64,7 +70,10 @@ int main(int argc, char *argv[])
            }
        }      
    }
+   gettimeofday(&tf, NULL);
+   time = (tf.tv_sec-ts.tv_sec)+(tf.tv_usec-ts.tv_usec)*0.000001;
    free_array(a, dim);
    free_array(b, dim);
    free_array(c, dim);
+   printf("Runtime: %lf\n", time);
 }

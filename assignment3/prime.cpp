@@ -112,16 +112,17 @@ int main(int argc, char *argv[]) {
   #pragma omp parallel
   {
     int id = omp_get_thread_num();
+    std::cout << "threadID: " << id << std::endl;
     chunk_calc_prime(&args[id]);
   }
 
-  for (int i=2; i<max; i++) {
+/*for (int i=2; i<max; i++) {
     if (mark[i] == false) {
       std::cout << i << std::endl;
     }
     else {
     }
-  }
+    }*/
 
 return 0;
 }

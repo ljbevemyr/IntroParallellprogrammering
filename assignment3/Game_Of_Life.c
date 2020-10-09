@@ -70,46 +70,28 @@ static void print_to_pgm(int ** array, int N, int t) {
 #endif
 
 static void tick_thread(int T, int N, int ** current, int ** previous) {
-  printf("start thread\n");
   int t, i, j, nbrs;
   int thread_num = omp_get_thread_num();
   int thread_tot = omp_get_num_threads();
-  int tot_elem = (N-2)*(N-2) / thread_tot; //så många element tråden ska räkna
-  int start_v, start_h, end_v, end_h;
-  /*int start_horizontal = ((thread_num * tot_elements) / N) + 1;
-  int start_vertical = ((thread_num * tot_elements) % N) + 1;
-  int end_horizontal, end_vertical;
-  if (thread_num == thread_tot) {
-    end_horizontal = N-1;
-    end_vertical = N-1;
-  }
-  else{
-    end_horizontal = ((thread_num+1) * tot_elements / N)+1;// ((0+1)*16/10)+1 = 2
-    end_vertical = ((thead_num+1) * tot_elements) % N;// ((0+1)*16%10) = 6
-    }*/
+  int size = N/thread_tot;
+  int *start = malloc(thread_tot * sizeof(int*));
+  int *end = malloc(thread_tot * sizeof(int*));
 
-  if (thread_num == 0) {
-    start_v = 1;
-    start_h = 1;
-    end_v = (tot_elem / (N-2)) + 1;
-    end_h = (tot_elem % (N-2));
+  start[0] = 1;
+  for (i=0; i < thread_tot-1; i++) {
+    end[i] = start[i] + size;
+    start[i+1] = end[i] + 1;
   }
-  else if (thread_num == thread_tot) {
-    start_v = (tot_elem*(thread_num) / (N-2)) + 1;
-    start_h = (tot_elem*(thread_num) % (N-2));
-    end_v = N-1;
-    end_h = N-1;
-  }
-  else {
-    start_v = (tot_elem*(thread_num) / (N-2)) + 1;
-    start_h = (tot_elem*(thread_num) % (N-2));
-    end_v = (tot_elem*(thread_num+1) / (N-2)) + 1;
-    end_h = (tot_elem*(thread_num+1) % (N-2));
-  }
-  printf("Thread: %d, start: %d:%d, end: %d:%d\n", thread_num, start_v, start_h, end_v, end_h);
-  for (t = 0 ; t < T ; t++) { //time steps
-    for (i = start_v ; i < end_v ; i++) //array dimensions
-      for (j = start_h ; j < end_h ; j++) { //array dimensions
+  end[thread_tot-1] = N-2;
+
+  int s = start[thread_num];
+  int e = end[thread_num];
+
+  //printf("N: %d, TOT: %d, Thread: %d, start: %d, end: %d\n", N, thread_tot, thread_num, s, e);
+
+  for (t = 0 ; t < T ; t++) {
+    for (i = s ; i <= e ; i++)
+      for (j = 1 ; j < N-1 ; j++) {
         nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
           + previous[i][j-1] + previous[i][j+1] \
           + previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
@@ -119,7 +101,7 @@ static void tick_thread(int T, int N, int ** current, int ** previous) {
           current[i][j] = 0;
       }
     #ifdef OUTPUT
-    print_to_pgm(current, N, t+1);
+    //print_to_pgm(current, N, t+1);
     #endif
     //Swap current array with previous array
     int ** swap = current;
@@ -135,8 +117,6 @@ int main (int argc, char * argv[]) {
   int N; //array dimensions
   int T; //time steps
   int ** current, ** previous; //arrays - one for current timestep, one for previous timestep
-  //int ** swap;//array pointer
-  //int t, i, j, nbrs;//helper variables
   int threads;
 
   double time;//variables for timing
@@ -159,35 +139,12 @@ int main (int argc, char * argv[]) {
 
   init_random(previous, current, N);//initialize previous array with pattern
 
+  /*Game of Life*/
   #ifdef OUTPUT
     print_to_pgm(previous, N, 0);
   #endif
 
-  /*Game of Life*/
-
   gettimeofday(&ts,NULL);
-  /*for (t = 0 ; t < T ; t++) { //time steps
-    for (i = 1 ; i < N-1 ; i++) //array dimensions
-      for (j = 1 ; j < N-1 ; j++) { //array dimensions
-        nbrs = previous[i+1][j+1] + previous[i+1][j] + previous[i+1][j-1] \
-          + previous[i][j-1] + previous[i][j+1] \
-          + previous[i-1][j-1] + previous[i-1][j] + previous[i-1][j+1];
-        if (nbrs == 3 || ( previous[i][j]+nbrs == 3))
-          current[i][j] = 1;
-        else
-          current[i][j] = 0;
-      }
-
-#ifdef OUTPUT
-    print_to_pgm(current, N, t+1);
-#endif
-    //Swap current array with previous array
-    swap = current;
-    current = previous;
-    previous = swap;
-
-    }*/
-
   omp_set_num_threads(threads);
   #pragma omp parallel
   {

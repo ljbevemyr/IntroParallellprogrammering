@@ -6,9 +6,9 @@
 PROG=prime
 
 all: $(PROG).cpp
-	export OMP_NUM_THREADS=4
-	g++ -std=c++11 -Wall -pthread -fopenmp $(PROG).cpp -o $(PROG)
-	gcc -DOUTPUT -Wall -fopenmp Game_Of_Life.c -o gameOfLife 
+	g++ -Wall -pthread -fopenmp prime.cpp -o prime
+	gcc -DOUTPUT -Wall -fopenmp Game_Of_Life.c -o gameOfLife
+	gcc -DOUTPUT -Wall -fopenmp Game_Of_Life_Original.c -o gameOfLifeOriginal
 
 run_tests:
 

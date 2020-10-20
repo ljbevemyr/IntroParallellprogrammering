@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+int main (int argc, char *argv[]) {
+  int n = 3;
+  int b[3] = {3, 1, 0};
+  int A[3][3] = { {2, -3, 0}, {0, 1, 1}, {0, 0, -5} };
+  int x[3];
+  int row, col, red, i;
+
+  for (row = 0; row < n; row++)//OK
+    x[row] = b[row];//OK
+
+  for (col = n-1; col >= 0; col--) {
+    x[col] /= A[col][col];
+    
+    for (row = 0; row < col; row++)
+      x[row] -= A[row][col] * x[col];
+  }
+
+  for (i = 0; i < 3; i++) {
+    printf("x[%d] = %d\n", i, x[i]);
+  }
+  return 0;
+}

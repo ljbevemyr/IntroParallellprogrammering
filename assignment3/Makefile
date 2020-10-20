@@ -3,14 +3,15 @@
 #
 # example Makefile to build an executable named myprog from myprog.cpp
 #
-PROG=prime
 
 all: $(PROG).cpp
-	g++ -std=c++11 -Wall -pthread -fopenmp $(PROG).cpp -o $(PROG)
+	g++ -Wall -pthread -fopenmp prime.cpp -o prime
 	gcc -DOUTPUT -Wall -fopenmp Game_Of_Life.c -o gameOfLife
 	gcc -Wall -fopenmp cMatrixMultiplication.c -o cMatrixMultiplication
 	gcc -DOUTPUT -Wall -fopenmp Game_Of_Life.c -o gameOfLife
-	gcc -DOUTPUT -Wall -fopenmp Game_Of_Life_Original.c -o gameOfLifeOriginal
+	gcc -DOUTPUT -Wall -fopenmp -g gausian_elimination_row.c -o gausian_row
+	gcc -DOUTPUT -Wall -fopenmp -g gausian_elimination_col.c -o gausian_col
+
 
 run_tests:
 
